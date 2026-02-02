@@ -42,13 +42,13 @@ public class AdminBankService {
         return bankRepository.save(bank);
     }
 
-    // Updates the interest rate for ALL products of a specific bank (Bulk Update)
+    // --- FIX: Update Specific Loan Product instead of All Bank Products ---
     @Transactional
-    public void updateBaseInterestRate(Long bankId, BigDecimal newRate) {
-        List<LoanProduct> products = loanProductRepository.findByBankId(bankId);
-        for (LoanProduct product : products) {
-            product.setInterestRate(newRate);
-            loanProductRepository.save(product);
-        }
+    public void updateLoanProductInterestRate(Long productId, BigDecimal newRate) {
+        LoanProduct product = loanProductRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Loan Product not found with ID: " + productId));
+
+        product.setInterestRate(newRate);
+        loanProductRepository.save(product);
     }
 }

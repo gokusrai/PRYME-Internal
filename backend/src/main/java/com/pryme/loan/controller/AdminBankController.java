@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/admin/banks")
+@RequestMapping("/api/v1/admin") // Generalized path
 @CrossOrigin(origins = "http://localhost:3000")
 public class AdminBankController {
 
@@ -20,27 +20,35 @@ public class AdminBankController {
         this.adminBankService = adminBankService;
     }
 
-    @PostMapping
+    // --- BANK MANAGEMENT ---
+
+    @PostMapping("/banks")
     public ResponseEntity<Bank> createBank(@Valid @RequestBody BankDto dto) {
         return ResponseEntity.ok(adminBankService.createBank(dto));
     }
 
-    @GetMapping
+    @GetMapping("/banks")
     public ResponseEntity<List<Bank>> getAllBanks() {
         return ResponseEntity.ok(adminBankService.getAllBanks());
     }
 
-    @PatchMapping("/{id}/toggle")
+    @PatchMapping("/banks/{id}/toggle")
     public ResponseEntity<Bank> toggleVisibility(@PathVariable Long id) {
         return ResponseEntity.ok(adminBankService.toggleVisibility(id));
     }
 
-    @PatchMapping("/{id}/rate")
-    public ResponseEntity<String> updateInterestRate(@PathVariable Long id, @Valid @RequestBody BankDto dto) {
+    // --- PRODUCT MANAGEMENT (The Fix) ---
+
+    // Changed path from /banks/{id}/rate to /products/{id}/rate
+    @PatchMapping("/products/{productId}/rate")
+    public ResponseEntity<String> updateProductRate(@PathVariable Long productId, @Valid @RequestBody BankDto dto) {
         if (dto.baseInterestRate() == null) {
             return ResponseEntity.badRequest().body("baseInterestRate is required");
         }
-        adminBankService.updateBaseInterestRate(id, dto.baseInterestRate());
-        return ResponseEntity.ok("Interest rates updated successfully");
+
+        // Use the new precise service method
+        adminBankService.updateLoanProductInterestRate(productId, dto.baseInterestRate());
+
+        return ResponseEntity.ok("Interest rate updated for Product ID: " + productId);
     }
 }
