@@ -6,6 +6,7 @@ import com.pryme.loan.repository.BlogPostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import com.pryme.loan.exception.ResourceNotFoundException;
 
 import java.util.List;
 
@@ -22,7 +23,7 @@ public class BlogService {
 
     public BlogPost getPostBySlug(String slug) {
         return blogRepository.findBySlug(slug)
-                .orElseThrow(() -> new RuntimeException("Blog post not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Blog post not found with slug: " + slug)); // UPDATED
     }
 
     public BlogPost createPost(BlogPostRequest request) {
@@ -57,7 +58,7 @@ public class BlogService {
 
     public BlogPost updatePost(Long id, BlogPostRequest request) {
         BlogPost post = blogRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Blog post not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Blog post not found with id: " + id)); // UPDATED
 
         post.setTitle(request.getTitle());
         post.setContent(request.getContent());
